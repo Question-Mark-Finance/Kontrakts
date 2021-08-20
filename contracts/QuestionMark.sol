@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
+pragma solidity 0.8.0;
 
 /*
 
@@ -53,9 +53,9 @@ pragma solidity 0.6.12;
 contract Context {
     // Empty internal constructor, to prevent people from mistakenly deploying
     // an instance of this contract, which should be used via inheritance.
-    constructor() internal {}
+    constructor()  {}
 
-    function _msgSender() internal view returns (address payable) {
+    function _msgSender() internal view returns (address) {
         return msg.sender;
     }
 
@@ -86,7 +86,7 @@ contract Ownable is Context {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor() internal {
+    constructor()  {
         address msgSender = _msgSender();
         _owner = msgSender;
         emit OwnershipTransferred(address(0), msgSender);
@@ -627,7 +627,7 @@ contract BEP20 is Context, IBEP20, Ownable {
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor(string memory name, string memory symbol) public {
+    constructor(string memory name, string memory symbol)  {
         _name = name;
         _symbol = symbol;
         _decimals = 18;
@@ -904,7 +904,7 @@ contract QuestionMark is BEP20('?', '?') {
     // Which is copied and modified from COMPOUND:
     // https://github.com/compound-finance/compound-protocol/blob/master/contracts/Governance/Comp.sol
 
-    /// @notice A record of each accounts delegate
+    // @notice A record of each accounts delegate
     mapping (address => address) internal _delegates;
 
     /// @notice A checkpoint for marking number of votes from a given block
@@ -1002,7 +1002,7 @@ contract QuestionMark is BEP20('?', '?') {
         address signatory = ecrecover(digest, v, r, s);
         require(signatory != address(0), "Farm::delegateBySig: invalid signature");
         require(nonce == nonces[signatory]++, "Farm::delegateBySig: invalid nonce");
-        require(now <= expiry, "Farm::delegateBySig: signature expired");
+        require(block.timestamp <= expiry, "Farm::delegateBySig: signature expired");
         return _delegate(signatory, delegatee);
     }
 
@@ -1083,7 +1083,7 @@ contract QuestionMark is BEP20('?', '?') {
                 // decrease old representative
                 uint32 srcRepNum = numCheckpoints[srcRep];
                 uint256 srcRepOld = srcRepNum > 0 ? checkpoints[srcRep][srcRepNum - 1].votes : 0;
-                uint256 srcRepNew = srcRepOld.sub(amount);
+                uint256 srcRepNew = srcRepOld - (amount);
                 _writeCheckpoint(srcRep, srcRepNum, srcRepOld, srcRepNew);
             }
 
@@ -1091,7 +1091,7 @@ contract QuestionMark is BEP20('?', '?') {
                 // increase new representative
                 uint32 dstRepNum = numCheckpoints[dstRep];
                 uint256 dstRepOld = dstRepNum > 0 ? checkpoints[dstRep][dstRepNum - 1].votes : 0;
-                uint256 dstRepNew = dstRepOld.add(amount);
+                uint256 dstRepNew = dstRepOld + (amount);
                 _writeCheckpoint(dstRep, dstRepNum, dstRepOld, dstRepNew);
             }
         }
@@ -1122,7 +1122,7 @@ contract QuestionMark is BEP20('?', '?') {
         return uint32(n);
     }
 
-    function getChainId() internal pure returns (uint) {
+    function getChainId() internal view returns (uint) {
         uint256 chainId;
         assembly { chainId := chainid() }
         return chainId;
